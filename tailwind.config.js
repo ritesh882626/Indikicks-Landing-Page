@@ -3,6 +3,18 @@ export default {
   theme: {
     extend: {
       colors: {
+        indikicks: {
+          black: '#000000',
+          cloud: '#F5F5F2',
+          white: '#FFFFFF',
+          concrete: '#2E2E2E',
+          stone: '#CFCAC2',
+          ash: '#A8A8A8',
+          teal: '#285C4D',
+          saffron: '#C56A2D',
+          red: '#8E1F1F',
+          ice: '#DCEBFF'
+        },
         jet: '#000000',
         cloud: '#F5F5F2',
         concrete: '#2E2E2E',

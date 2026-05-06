@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  color: #000;
+  color: #000000;
   background: #f5f5f2;
   font-family: Inter, system-ui, sans-serif;
   scroll-behavior: smooth;
@@ -32,12 +32,12 @@ img {
 
 ::selection {
   background: #c56a2d;
-  color: #000;
+  color: #000000;
 }
 
 @layer components {
   .section-shell {
-    @apply relative overflow-hidden border-t border-black/10;
+    @apply relative overflow-hidden border-t border-indikicks-black/10;
   }
 
   .deck-container {
@@ -65,7 +65,7 @@ img {
   }
 
   .body-copy {
-    @apply max-w-[640px] text-[15px] leading-7 text-black/60 sm:text-lg sm:leading-8;
+    @apply max-w-[640px] text-[15px] leading-7 text-indikicks-concrete/70 sm:text-lg sm:leading-8;
   }
 
   .caption {
@@ -78,39 +78,39 @@ img {
 
   .button-primary,
   .button-secondary {
-    @apply inline-flex min-h-12 w-full items-center justify-center gap-2 border px-5 text-center text-xs font-black uppercase tracking-[0.16em] transition duration-300 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jet sm:w-auto;
+    @apply inline-flex min-h-12 w-full items-center justify-center gap-2 border px-5 text-center text-xs font-black uppercase tracking-[0.16em] transition duration-300 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indikicks-black sm:w-auto;
   }
 
   .button-primary {
-    @apply border-jet bg-jet text-cloud hover:border-saffron hover:bg-saffron hover:text-jet;
+    @apply border-indikicks-black bg-indikicks-black text-indikicks-cloud hover:border-indikicks-concrete hover:bg-indikicks-concrete;
   }
 
   .button-secondary {
-    @apply border-black/20 text-jet hover:border-jet hover:bg-white;
+    @apply border-indikicks-black/20 text-indikicks-black hover:border-indikicks-black hover:bg-indikicks-black hover:text-indikicks-cloud;
   }
 
   .nav-link {
-    @apply inline-flex min-h-10 items-center px-4 text-[11px] font-black uppercase tracking-[0.18em] text-black/50 transition duration-500 hover:text-black;
+    @apply inline-flex min-h-10 items-center px-4 text-[11px] font-black uppercase tracking-[0.18em] text-indikicks-concrete/70 transition duration-500 hover:text-indikicks-saffron;
   }
 
   .mobile-nav-link {
-    @apply flex min-h-12 items-center border-b border-black/10 text-[12px] font-black uppercase tracking-[0.2em] text-black/70 transition active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-jet;
+    @apply flex min-h-12 items-center border-b border-indikicks-black/10 text-[12px] font-black uppercase tracking-[0.2em] text-indikicks-concrete/80 transition hover:text-indikicks-teal active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indikicks-black;
   }
 
   .quiet-card {
-    @apply relative border border-black/10 bg-white p-6 shadow-sm transition duration-500;
+    @apply relative border border-indikicks-black/10 bg-indikicks-white p-6 shadow-sm transition duration-500;
   }
 
   .image-frame {
-    @apply overflow-hidden border border-black/10 bg-white;
+    @apply overflow-hidden border border-indikicks-black/10 bg-indikicks-white;
   }
 
   .detail-label {
-    @apply absolute border border-black/10 bg-white/90 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-jet shadow-sm backdrop-blur;
+    @apply absolute border border-indikicks-black/10 bg-indikicks-white/90 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-indikicks-teal shadow-sm backdrop-blur;
   }
 
   .poster-line {
-    @apply border border-black/10 bg-white px-5 py-5 font-display text-[24px] font-bold leading-tight tracking-tight transition duration-500 sm:text-[40px];
+    @apply border border-indikicks-black/10 bg-indikicks-white px-5 py-5 font-display text-[24px] font-bold leading-tight tracking-tight transition duration-500 sm:text-[40px];
   }
 
   .mobile-snap-row {
@@ -140,30 +140,16 @@ img {
   mix-blend-mode: multiply;
 }
 
-.bg-jet.section-shell {
+.bg-indikicks-black.section-shell {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-.bg-jet .section-intro {
+.bg-indikicks-black .section-intro {
   color: rgba(245, 245, 242, 0.62);
 }
 
-.bg-jet .eyebrow {
+.bg-indikicks-black .eyebrow {
   color: rgba(245, 245, 242, 0.52);
-}
-
-.bg-black.section-shell,
-.bg-black .section-shell {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.bg-black .eyebrow {
-  color: rgba(255, 255, 255, 0.7);
-  opacity: 1;
-}
-
-.bg-black .section-title {
-  color: #ffffff;
 }
 
 @media (prefers-reduced-motion: reduce) {
