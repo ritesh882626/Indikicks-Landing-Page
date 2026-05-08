@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ArrowRight, CircleDot, Menu, MoveRight, X } from 'lucide-react'
+import { ArrowRight, Menu, MoveRight, X } from 'lucide-react'
 import {
   motion,
-  useMotionValue,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -14,35 +13,75 @@ import './styles.css'
 const A = '/assets/indikicks'
 
 const assets = {
-  logoWhite: `${A}/logo/indikicks-mark-white.png`,
-  logoBlack: `${A}/logo/indikicks-mark-black.png`,
-  logoSymbol: `${A}/logo/indikicks-symbol-transparent.png`,
-  canvasSide: `${A}/shoes/canvas-side-view.png`,
-  canvasBack: `${A}/shoes/canvas-back-pair.png`,
-  stitch: `${A}/shoes/stiched-logo-closeup.png`,
-  shoebox: `${A}/packaging/shoebox-black-premium.png`
+  logo: `${A}/logo/indikicks-symbol-transparent.png`,
+  side: `${A}/shoes/indikicks-side-view.png`,
+  opposite: `${A}/shoes/indikicks-opposite-side-view.png`,
+  top: `${A}/shoes/indikicks-top-view.png`,
+  heel: `${A}/shoes/indikicks-heel-view.png`,
+  logoClose: `${A}/shoes/indikicks-logo-closeup.png`,
+  sole: `${A}/shoes/indikicks-rubber-sole-closeup.png`,
+  canvas: `${A}/shoes/indikicks-shoe-canvas-texture.png`,
+  baggy: `${A}/lifestyle/indikicks-baggy.png`,
+  shoebox: `${A}/packaging/indikicks-shoebox.png`,
+  card: `${A}/packaging/indikicks-card.png`,
+  tissue: `${A}/packaging/indikicks-tissue.png`
 }
 
 const ease = [0.22, 1, 0.36, 1]
 const reveal = {
   hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease } }
+  show: { opacity: 1, y: 0, transition: { duration: 0.68, ease } }
+}
+const imageReveal = {
+  hidden: { opacity: 0, scale: 1.02 },
+  show: { opacity: 1, scale: 1, transition: { duration: 0.9, ease } }
 }
 const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.08 } }
+  show: { transition: { staggerChildren: 0.1 } }
+}
+
+const navLinks = [
+  ['Story', 'story'],
+  ['Positioning', 'positioning'],
+  ['Logo', 'logo'],
+  ['Colors', 'colors'],
+  ['Craft', 'craft'],
+  ['Packaging', 'packaging'],
+  ['Voice', 'voice'],
+  ['Community', 'community'],
+  ['Blueprint', 'blueprint']
+]
+
+function SmartImage({ src, alt, className = '', fit = 'object-cover', loading = 'lazy' }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading={loading}
+      onError={(event) => {
+        event.currentTarget.hidden = true
+        event.currentTarget.parentElement?.classList.add('missing-image')
+        event.currentTarget.parentElement?.style.setProperty('--missing-path', `"${src}"`)
+      }}
+      className={`h-full w-full ${fit} ${className}`}
+    />
+  )
 }
 
 function Section({ id, eyebrow, title, intro, dark = false, children, className = '' }) {
   return (
-    <section id={id} className={`section-shell ${dark ? 'bg-indikicks-black text-indikicks-cloud' : 'bg-indikicks-cloud text-indikicks-black'} ${className}`}>
+    <section
+      id={id}
+      className={`section-shell ${dark ? 'bg-indikicks-black text-indikicks-cloud' : 'bg-indikicks-cloud text-indikicks-black'} ${className}`}
+    >
       <div className="deck-container">
         {(eyebrow || title || intro) && (
           <motion.header
             variants={stagger}
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, amount: 0.34 }}
+            viewport={{ once: true, amount: 0.32 }}
             className="section-heading"
           >
             {eyebrow && <motion.p variants={reveal} className="eyebrow">{eyebrow}</motion.p>}
@@ -56,69 +95,45 @@ function Section({ id, eyebrow, title, intro, dark = false, children, className 
   )
 }
 
-function LogoMark({ tone = 'white', className = '' }) {
-  return (
-    <img
-      src={tone === 'black' ? assets.logoBlack : assets.logoWhite}
-      alt="Indikicks logo mark"
-      className={`object-contain ${className}`}
-    />
-  )
-}
-
-function Image({ src, alt, className = '', fit = 'object-cover' }) {
-  return <img src={src} alt={alt} loading="lazy" className={`h-full w-full ${fit} ${className}`} />
-}
-
-function IntroScreen() {
-  return (
-    <motion.div
-      className="pointer-events-none fixed inset-0 z-[90] grid place-items-center bg-indikicks-black text-indikicks-cloud"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 0, transition: { delay: 1.65, duration: 0.75, ease } }}
-    >
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }} className="flex flex-col items-center gap-7">
-        <LogoMark className="h-14 w-36" />
-        <motion.div className="h-px w-64 origin-left bg-indikicks-cloud" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: 0.4, duration: 0.8, ease }} />
-        <p className="text-xs font-bold uppercase tracking-[0.32em] text-indikicks-cloud/70">Forward, From Here.</p>
-      </motion.div>
-    </motion.div>
-  )
+function Button({ href, children, tone = 'primary', dark = false }) {
+  const className = dark
+    ? tone === 'primary' ? 'button-dark-primary' : 'button-dark-secondary'
+    : tone === 'primary' ? 'button-primary' : 'button-secondary'
+  return <a href={href} className={className}>{children}</a>
 }
 
 function Header() {
   const [open, setOpen] = useState(false)
-  const links = [
-    ['Story', 'story'],
-    ['Positioning', 'positioning'],
-    ['Logo', 'logo'],
-    ['Colors', 'color'],
-    ['Craft', 'craft'],
-    ['Packaging', 'packaging'],
-    ['Voice', 'voice'],
-    ['Community', 'community'],
-    ['Blueprint', 'blueprint']
-  ]
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-indikicks-black/10 bg-indikicks-cloud/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-[1360px] items-center justify-between px-5 sm:px-8 lg:px-10">
-        <a href="#hero" className="flex items-center gap-3 text-indikicks-black" aria-label="Indikicks home">
-          <LogoMark tone="black" className="h-6 w-14" />
-          <span className="text-sm font-black lowercase tracking-tight">indikicks</span>
+      <div className="mx-auto flex h-16 max-w-[1320px] items-center justify-between px-5 sm:px-8 lg:px-10">
+        <a href="#hero" className="flex items-center gap-3 focus-link" aria-label="Indikicks home">
+          <img src={assets.logo} alt="" className="h-6 w-12 object-contain" />
+          <span className="text-xs font-bold uppercase tracking-[0.2em]">Indikicks</span>
         </a>
-        <nav className="hidden items-center gap-1 md:flex">
-          {links.map(([label, href]) => (
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+          {navLinks.map(([label, href]) => (
             <a key={href} href={`#${href}`} className="nav-link">{label}</a>
           ))}
         </nav>
-        <button className="grid h-11 w-11 place-items-center border border-indikicks-black/15 transition active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indikicks-black md:hidden" onClick={() => setOpen((v) => !v)} aria-label="Toggle menu">
-          {open ? <X size={17} /> : <Menu size={17} />}
+        <button
+          className="grid h-11 w-11 place-items-center border border-indikicks-black/15 transition duration-300 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indikicks-teal lg:hidden"
+          onClick={() => setOpen((value) => !value)}
+          aria-label="Toggle menu"
+          aria-expanded={open}
+        >
+          {open ? <X size={18} /> : <Menu size={18} />}
         </button>
       </div>
       {open && (
-        <motion.nav initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="grid max-h-[calc(100svh-4rem)] gap-1 overflow-y-auto border-t border-indikicks-black/10 bg-indikicks-cloud px-5 py-4 md:hidden">
-          {links.map(([label, href]) => (
+        <motion.nav
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid max-h-[calc(100svh-4rem)] gap-1 overflow-y-auto border-t border-indikicks-black/10 bg-indikicks-cloud px-5 py-4 lg:hidden"
+          aria-label="Mobile"
+        >
+          {navLinks.map(([label, href]) => (
             <a key={href} href={`#${href}`} className="mobile-nav-link" onClick={() => setOpen(false)}>{label}</a>
           ))}
         </motion.nav>
@@ -133,53 +148,31 @@ function ScrollProgress() {
   return <motion.div className="fixed left-0 top-0 z-[70] h-0.5 origin-left bg-indikicks-saffron" style={{ scaleX }} />
 }
 
-function CursorSpotlight() {
-  const reduce = useReducedMotion()
-  const x = useMotionValue(-200)
-  const y = useMotionValue(-200)
-
-  useEffect(() => {
-    if (reduce) return
-    const onMove = (event) => {
-      x.set(event.clientX)
-      y.set(event.clientY)
-    }
-    window.addEventListener('pointermove', onMove)
-    return () => window.removeEventListener('pointermove', onMove)
-  }, [reduce, x, y])
-
-  if (reduce) return null
-  return <motion.div aria-hidden className="cursor-spotlight hidden lg:block" style={{ x, y }} />
-}
-
 function HeroSection() {
-  const words = ['Forward,', 'From', 'Here.']
-
   return (
-    <section id="hero" className="relative min-h-[100svh] overflow-hidden bg-indikicks-cloud pt-16 text-indikicks-black">
+    <section id="hero" className="relative min-h-[100svh] overflow-hidden bg-indikicks-cloud text-indikicks-black">
       <motion.img
-        src={assets.canvasSide}
-        alt="Indikicks canvas side-view sneaker"
-        className="pointer-events-none absolute left-1/2 bottom-0 h-[55svh] w-[115vw] -translate-x-1/2 object-contain object-bottom md:inset-0 md:h-full md:w-full md:translate-x-0 md:object-cover md:object-center"
+        src={assets.side}
+        alt="Indikicks canvas sneaker side view"
+        className="pointer-events-none absolute left-1/2 bottom-0 z-0 hidden h-[52svh] w-[118vw] -translate-x-1/2 select-none object-contain object-bottom md:inset-0 md:block md:h-full md:w-full md:translate-x-0 md:object-cover md:object-center"
         initial={{ opacity: 0, scale: 1.02 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.25, ease }}
+        transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-indikicks-cloud via-indikicks-cloud/70 to-indikicks-cloud/10 md:bg-gradient-to-r md:from-indikicks-cloud/75 md:via-indikicks-cloud/30 md:to-transparent" />
-      <div className="deck-container relative z-10 flex min-h-[calc(100svh-4rem)] flex-col justify-start px-6 pb-[52svh] pt-28 sm:pb-[48svh] md:justify-center md:px-12 md:py-20 lg:py-24">
-        <motion.div variants={stagger} initial="hidden" animate="show" className="max-w-[640px]">
-          <motion.p variants={reveal} className="eyebrow text-indikicks-black opacity-70">INDIKICKS / BRAND IDENTITY</motion.p>
-          <h1 className="hero-title">
-            {words.map((word) => (
-              <motion.span variants={reveal} className="block" key={word}>{word}</motion.span>
-            ))}
-          </h1>
-          <motion.p variants={reveal} className="mt-7 max-w-[360px] text-[15px] leading-7 text-indikicks-concrete/80 sm:max-w-[620px] sm:text-lg sm:leading-8">
-            Sneakers for India&apos;s forward generation - clean, confident, and built to move without asking permission.
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-indikicks-cloud via-indikicks-cloud/80 to-indikicks-cloud/10 md:bg-gradient-to-r md:from-indikicks-cloud/80 md:via-indikicks-cloud/35 md:to-transparent" />
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[1320px] flex-col justify-center px-6 py-24 md:px-12 md:py-0">
+        <motion.div variants={stagger} initial="hidden" animate="show" className="max-w-[650px]">
+          <motion.p variants={reveal} className="eyebrow text-indikicks-black/70">INDIKICKS / BRAND IDENTITY</motion.p>
+          <motion.h1 variants={reveal} className="hero-title">Own Your Walk.</motion.h1>
+          <motion.p variants={reveal} className="mt-7 max-w-[620px] text-base leading-7 text-indikicks-concrete/75 sm:text-lg sm:leading-8">
+            Sneakers for a generation that moves with identity, confidence, and self-expression.
           </motion.p>
-          <motion.div variants={reveal} className="mt-9 flex w-full max-w-[320px] flex-col gap-3 min-[480px]:max-w-none min-[480px]:flex-row">
-            <a href="#tension" className="button-primary">Explore the Identity <ArrowRight size={17} /></a>
-            <a href="#logo" className="button-secondary">View Logo System</a>
+          <motion.p variants={reveal} className="mt-4 text-sm font-semibold uppercase tracking-[0.18em] text-indikicks-teal">
+            Born in India. Built for the streets ahead.
+          </motion.p>
+          <motion.div variants={reveal} className="mt-9 flex w-full max-w-[320px] flex-col gap-3 min-[520px]:max-w-none min-[520px]:flex-row">
+            <Button href="#tension">Explore Identity <ArrowRight size={16} /></Button>
+            <Button href="#logo" tone="secondary">View Logo System</Button>
           </motion.div>
         </motion.div>
       </div>
@@ -189,22 +182,22 @@ function HeroSection() {
 
 function BrandTensionSection() {
   const cards = [
-    ['Global Status', 'Global brands offer status, but not Indian cultural ownership.'],
-    ['Loud Locality', 'Many homegrown brands become too loud or literal.'],
-    ['Premium Restraint', 'Indikicks owns a sharper space: modern Indian confidence with control.']
+    ['Global brands gave us aspiration.', 'But not our identity.'],
+    ['Local brands gave us access.', 'But not enough culture.'],
+    ['Indikicks gives young India', 'a walk of its own.']
   ]
 
   return (
-    <Section id="tension" eyebrow="01 / Brand Tension" title="A cleaner lane for Indian sneaker culture.">
-      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mobile-snap-row md:grid md:grid-cols-3 md:overflow-visible">
-        {cards.map(([title, body], index) => (
-          <motion.article variants={reveal} whileHover={{ y: -4 }} key={title} className="quiet-card snap-card md:min-w-0">
-            <div className="mb-16 flex items-center justify-between text-indikicks-concrete/50">
+    <Section id="tension" eyebrow="01 / Brand Tension" title="The gap was never just product. It was ownership.">
+      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.22 }} className="mobile-snap-row md:grid md:grid-cols-3 md:overflow-visible md:px-0">
+        {cards.map(([line, close], index) => (
+          <motion.article variants={reveal} whileHover={{ y: -4 }} key={line} className="quiet-card snap-card md:min-w-0">
+            <div className="mb-16 flex items-center justify-between">
               <MoveRight className="h-5 w-5 text-indikicks-saffron" />
-              <span className="caption">0{index + 1}</span>
+              <span className="caption text-indikicks-concrete/45">0{index + 1}</span>
             </div>
-            <h3 className="card-title">{title}</h3>
-            <p className="mt-4 text-[15px] leading-7 text-indikicks-concrete/70">{body}</p>
+            <h3 className="card-title">{line}</h3>
+            <p className="mt-3 text-[17px] leading-7 text-indikicks-concrete/70">{close}</p>
           </motion.article>
         ))}
       </motion.div>
@@ -213,32 +206,23 @@ function BrandTensionSection() {
 }
 
 function BrandStorySection() {
+  const reduce = useReducedMotion()
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
-  const imageY = useTransform(scrollYProgress, [0, 1], [12, -12])
+  const imageY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [18, -18])
 
   return (
-    <Section
-      id="story"
-      eyebrow="02 / Brand Story"
-      title="Modern Indian Motion"
-    >
-      <div ref={ref} className="grid items-center gap-14 lg:grid-cols-[0.88fr_1.12fr]">
-        <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.75, ease }} className="max-w-[620px]">
-          <p className="body-copy">
-            Indikicks is built for a generation that does not need to choose between local roots and global ambition. The brand represents movement, self-possession, and the confidence of young India without turning identity into costume.
-          </p>
-          <div className="mt-10 grid gap-4 border-t border-indikicks-teal/20 pt-8 sm:grid-cols-3">
-            {['Movement', 'Self-possession', 'Restraint'].map((item) => (
-              <div key={item}>
-                <p className="caption text-indikicks-teal">Brand cue</p>
-                <p className="mt-2 font-bold">{item}</p>
-              </div>
-            ))}
-          </div>
+    <Section id="story" eyebrow="02 / Brand Story" title="Modern Indian Motion">
+      <div ref={ref} className="grid items-center gap-14 lg:grid-cols-[0.86fr_1.14fr]">
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.34 }} className="max-w-[620px]">
+          {[
+            'Indikicks was created for a generation that does not want to simply wear products. It wants to wear identity.',
+            'Young India is no longer waiting for global culture to define its taste. It is walking through campuses, streets, studios, metros, and digital spaces with its own rhythm.',
+            'Indikicks turns that movement into footwear: clean, expressive, accessible sneakers built for people who walk differently because they think differently.'
+          ].map((copy) => <motion.p variants={reveal} key={copy} className="body-copy mb-5">{copy}</motion.p>)}
         </motion.div>
-        <motion.figure style={{ y: imageY }} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.85, ease }} className="image-frame min-h-[360px] lg:min-h-[680px]">
-          <Image src={assets.canvasBack} alt="Indikicks heel and back-view sneaker pair" fit="object-contain" className="p-5 sm:p-10" />
+        <motion.figure style={{ y: imageY }} variants={imageReveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="image-frame min-h-[360px] lg:min-h-[640px]">
+          <SmartImage src={assets.heel} alt="Heel view of Indikicks sneakers with rear branding" fit="object-contain" className="p-4 sm:p-8" />
         </motion.figure>
       </div>
     </Section>
@@ -246,57 +230,45 @@ function BrandStorySection() {
 }
 
 function PositioningSection() {
-  const lines = ['Clean, confident sneakers', 'for India’s forward generation.']
+  const lines = ['Accessible street-premium sneakers', 'for young India’s self-expression.']
+
   return (
-    <Section id="positioning" dark className="bg-indikicks-black">
-      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.45 }} className="mx-auto max-w-5xl py-10 text-center">
+    <Section id="positioning" dark className="relative">
+      <img src={assets.logo} alt="" aria-hidden className="pointer-events-none absolute right-[-6rem] top-16 h-80 w-80 object-contain opacity-[0.04] sm:right-10 sm:h-[32rem] sm:w-[32rem]" />
+      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.46 }} className="max-w-5xl py-4">
+        <motion.div variants={reveal} className="mb-10 h-px w-24 bg-indikicks-saffron" />
         <motion.p variants={reveal} className="eyebrow text-indikicks-saffron opacity-100">03 / Positioning</motion.p>
-        <blockquote className="mx-auto max-w-4xl text-[38px] font-black leading-[1.05] tracking-tight text-indikicks-cloud sm:text-5xl lg:text-[60px]">
+        <blockquote className="max-w-5xl text-[36px] font-bold leading-[1.08] tracking-normal text-indikicks-cloud sm:text-[52px] lg:text-[68px]">
           {lines.map((line) => <motion.span variants={reveal} className="block" key={line}>{line}</motion.span>)}
         </blockquote>
-        <motion.p variants={reveal} className="mt-8 text-lg text-indikicks-cloud/70">Indian by instinct. Global by design.</motion.p>
+        <motion.p variants={reveal} className="mt-9 max-w-[660px] text-base leading-8 text-indikicks-cloud/70 sm:text-lg">
+          Not performance-first. Not hype-only. Not fake luxury. A culture-first sneaker label built around identity, movement, and confidence.
+        </motion.p>
       </motion.div>
     </Section>
   )
 }
 
 function LogoSystemSection() {
-  const rules = [
-    'Keep the mark pure.',
-    'No extra lines.',
-    'No decorative additions.',
-    'No unnecessary effects.',
-    'Let negative space do the work.'
-  ]
+  const rules = ['One mark.', 'No extra lines.', 'No decorative additions.', 'No unnecessary effects.', 'Built into the product, not pasted on top.']
 
   return (
-    <Section id="logo" dark className="logo-system-section">
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.45 }}
-        className="mx-auto grid min-h-[56vh] max-w-4xl place-items-center text-center sm:min-h-[70vh]"
-      >
+    <Section id="logo" className="bg-indikicks-cloud">
+      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.42 }} className="mx-auto grid min-h-[62vh] max-w-5xl place-items-center text-center">
         <motion.img
-          variants={{
-            hidden: { opacity: 0, scale: 0.96 },
-            show: { opacity: 1, scale: 1, transition: { duration: 0.95, ease } }
-          }}
-          src={assets.logoSymbol}
-          alt="Indikicks forward-motion logo symbol"
-          className="h-20 w-56 object-contain sm:h-36 sm:w-[24rem]"
+          variants={{ hidden: { opacity: 0, scale: 0.96 }, show: { opacity: 1, scale: 1, transition: { duration: 0.92, ease } } }}
+          src={assets.logo}
+          alt="Indikicks Forward Mark logo symbol"
+          className="h-24 w-60 object-contain sm:h-36 sm:w-[25rem]"
         />
         <motion.div variants={reveal} className="mt-12">
-          <p className="eyebrow text-indikicks-saffron opacity-100">04 / Logo System</p>
-          <h2 className="section-title mx-auto text-indikicks-cloud">The Forward Mark</h2>
-          <p className="section-intro mx-auto text-indikicks-cloud/70">
-            A single directional symbol for movement, ambition, and modern Indian confidence.
-          </p>
+          <p className="eyebrow text-indikicks-teal opacity-100">04 / Logo System</p>
+          <h2 className="section-title mx-auto">The Forward Mark</h2>
+          <p className="section-intro mx-auto">A single directional symbol for movement, ambition, and self-expression.</p>
         </motion.div>
         <motion.div variants={stagger} className="mt-10 grid w-full gap-3 sm:grid-cols-5">
           {rules.map((rule) => (
-            <motion.div variants={reveal} key={rule} className="border border-indikicks-cloud/10 bg-indikicks-concrete px-4 py-5 text-sm leading-6 text-indikicks-cloud/70">
+            <motion.div variants={reveal} key={rule} className="border border-indikicks-black/10 bg-indikicks-white px-4 py-5 text-sm leading-6 text-indikicks-concrete/75">
               {rule}
             </motion.div>
           ))}
@@ -307,100 +279,135 @@ function LogoSystemSection() {
 }
 
 function ColorSystemSection() {
-  const colors = [
-    ['Jet Black', '#000000', 'Primary contrast'],
-    ['Cloud White', '#F5F5F2', 'Main brand field'],
-    ['Pure White', '#FFFFFF', 'Product focus'],
-    ['Concrete Grey', '#2E2E2E', 'Urban depth'],
-    ['Stone', '#CFCAC2', 'Material warmth'],
-    ['Ash Grey', '#A8A8A8', 'Quiet dividers'],
-    ['Deep Teal', '#285C4D', 'Controlled city accent'],
-    ['Burnt Saffron', '#C56A2D', 'Warm Indian accent'],
-    ['Deep Energy Red', '#8E1F1F', 'Rare emphasis'],
-    ['Ice Blue', '#DCEBFF', 'Soft UI highlight']
+  const groups = [
+    ['Foundation', [
+      ['Jet Black', '#000000', 'Primary contrast'],
+      ['Cloud White', '#F5F5F2', 'Main brand field'],
+      ['Pure White', '#FFFFFF', 'Product focus']
+    ]],
+    ['Urban Neutrality', [
+      ['Concrete Grey', '#2E2E2E', 'Urban depth'],
+      ['Stone', '#CFCAC2', 'Material warmth'],
+      ['Ash Grey', '#A8A8A8', 'Quiet dividers']
+    ]],
+    ['Controlled Energy', [
+      ['Deep Teal', '#285C4D', 'Strategic accent'],
+      ['Burnt Saffron', '#C56A2D', 'Warm signal'],
+      ['Deep Energy Red', '#8E1F1F', 'Rare emphasis'],
+      ['Ice Blue', '#DCEBFF', 'Soft highlight']
+    ]]
   ]
 
   return (
-    <Section id="color" eyebrow="05 / Color System" title="80% neutral restraint. 20% controlled accent.">
-      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mobile-snap-row border-indikicks-black/10 bg-indikicks-ash/30 lg:grid lg:grid-cols-10 lg:gap-px lg:overflow-hidden lg:border">
-        {colors.map(([name, hex, role]) => (
-          <motion.div variants={reveal} whileHover={{ minHeight: 220 }} key={hex} className="group min-h-[220px] min-w-[72vw] snap-start bg-indikicks-white p-4 transition-all duration-500 ease-out sm:min-w-[260px] lg:min-h-[420px] lg:min-w-0" style={{ backgroundColor: hex, color: ['#000000', '#2E2E2E', '#285C4D', '#8E1F1F'].includes(hex) ? '#F5F5F2' : '#000000' }}>
-            <p className="caption opacity-65">{name}</p>
-            <p className="mt-2 font-mono text-xs opacity-55">{hex}</p>
-            <p className="mt-10 max-w-32 text-sm leading-6 opacity-70 transition-opacity duration-500 lg:opacity-0 lg:group-hover:opacity-70">{role}</p>
-          </motion.div>
+    <Section id="colors" eyebrow="05 / Color System" title="80% restraint. 20% signal.">
+      <div className="space-y-10">
+        {groups.map(([group, colors]) => (
+          <div key={group}>
+            <p className="caption mb-4 text-indikicks-teal">{group}</p>
+            <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} className="mobile-snap-row md:grid md:grid-cols-3 md:overflow-visible md:px-0 lg:grid-cols-4">
+              {colors.map(([name, hex, role]) => {
+                const dark = ['#000000', '#2E2E2E', '#285C4D', '#8E1F1F'].includes(hex)
+                return (
+                  <motion.article
+                    variants={reveal}
+                    whileHover={{ y: -4, scale: 1.01 }}
+                    key={hex}
+                    className={`color-swatch snap-card ${dark ? 'text-indikicks-cloud' : 'text-indikicks-black'}`}
+                    style={{ backgroundColor: hex }}
+                  >
+                    <p className="caption opacity-70">{name}</p>
+                    <p className="mt-2 font-mono text-xs opacity-60">{hex}</p>
+                    <p className="mt-auto max-w-36 text-sm leading-6 opacity-72">{role}</p>
+                  </motion.article>
+                )
+              })}
+            </motion.div>
+          </div>
+        ))}
+      </div>
+    </Section>
+  )
+}
+
+function CraftsmanshipSection() {
+  const details = [
+    ['01', 'Stitched Side Mark', assets.logoClose, 'The logo is integrated into the shoe, not printed.', 'Deep Teal'],
+    ['02', 'Canvas Texture', assets.canvas, 'Everyday material elevated through clean construction.', 'Burnt Saffron'],
+    ['03', 'Rubber Foxing', assets.sole, 'Classic streetwear utility with bold black striping.', 'Deep Teal'],
+    ['04', 'Heel Identity', assets.heel, 'Small details that make the product recognizable from every angle.', 'Burnt Saffron']
+  ]
+
+  return (
+    <Section id="craft" className="bg-indikicks-white text-indikicks-black" eyebrow="06 / Craftsmanship" title="Built to feel considered.">
+      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.16 }} className="mobile-snap-row lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0">
+        {details.map(([number, title, image, copy, accent]) => (
+          <motion.article variants={reveal} key={title} className="craft-card snap-card lg:min-w-0">
+            <div className="aspect-[4/5] overflow-hidden bg-indikicks-cloud">
+              <SmartImage src={image} alt={`${title} detail of Indikicks sneaker`} className="transition duration-700 hover:scale-[1.025]" />
+            </div>
+            <div className="p-5">
+              <p className={`caption ${accent === 'Deep Teal' ? 'text-indikicks-teal' : 'text-indikicks-saffron'}`}>{number} / {accent}</p>
+              <h3 className="mt-5 text-xl font-bold tracking-normal">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-indikicks-concrete/70">{copy}</p>
+            </div>
+          </motion.article>
         ))}
       </motion.div>
     </Section>
   )
 }
 
-function CraftsmanshipSection() {
-  const details = ['Stitched logo', 'Canvas texture', 'Rubber foxing', 'Metal eyelets', 'Heel branding', 'Packaging finish']
-
-  return (
-    <Section
-      id="craft"
-      className="bg-indikicks-white text-indikicks-black"
-      eyebrow="06 / Craftsmanship"
-      title="Quality is shown in the small decisions."
-      intro="The logo should feel integrated into construction: stitched, molded, appliqued, and materially present."
-    >
-      <div className="grid gap-8 lg:grid-cols-[1.12fr_0.88fr]">
-        <motion.figure initial={{ opacity: 0, scale: 0.985 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.8, ease }} className="relative min-h-[360px] overflow-hidden border border-indikicks-black/10 bg-indikicks-cloud lg:min-h-[560px]">
-          <Image src={assets.stitch} alt="Indikicks stitched logo detail on canvas sneaker" fit="object-contain" className="p-4" />
-          {['stitched mark', 'metal eyelets', 'rubber foxing'].map((label, index) => (
-            <span key={label} className={`detail-label ${index === 0 ? 'left-[42%] top-[53%]' : index === 1 ? 'left-[42%] top-[40%]' : 'left-[15%] top-[72%]'}`}>{label}</span>
-          ))}
-        </motion.figure>
-        <div className="mobile-snap-row lg:grid lg:content-center lg:gap-3 lg:overflow-visible">
-          {details.map((detail, index) => (
-            <motion.div variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} key={detail} className="flex min-w-[68vw] snap-start items-center justify-between border border-indikicks-black/10 bg-indikicks-cloud p-5 lg:min-w-0 lg:border-x-0 lg:border-t-0 lg:bg-transparent lg:py-5">
-              <span className="text-lg font-bold">{detail}</span>
-              <span className="caption text-indikicks-teal">0{index + 1}</span>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </Section>
-  )
-}
-
 function PackagingSection() {
-  const principles = ['Matte black box', 'White motion mark', 'Minimal side label', 'Subtle accent details', 'Logo-patterned tissue paper']
+  const bullets = ['Matte black structure', 'Centered Forward Mark', 'Tonal logo-pattern tissue', '“Own Your Walk” thank-you card', 'QR-linked campaign story', 'Sticker/decal system for community sharing']
 
   return (
-    <Section id="packaging" className="bg-indikicks-white text-indikicks-black" eyebrow="07 / Packaging" title="The system extends beyond the shoe.">
-      <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]">
-        <motion.figure initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.85, ease }} className="relative order-2 overflow-hidden border border-indikicks-black/10 bg-indikicks-cloud p-3 shadow-xl shadow-indikicks-black/10 lg:order-1">
-          <Image src={assets.shoebox} alt="Indikicks premium black shoebox packaging" fit="object-cover" className="aspect-[4/3]" />
+    <Section id="packaging" className="bg-indikicks-white text-indikicks-black" eyebrow="07 / Packaging" title="Not just a box. The first touchpoint of the culture.">
+      <div className="grid items-center gap-8 lg:grid-cols-[1.08fr_0.92fr]">
+        <motion.figure variants={imageReveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.24 }} className="image-frame bg-indikicks-cloud p-3 shadow-xl shadow-indikicks-black/10">
+          <SmartImage src={assets.shoebox} alt="Indikicks matte black shoebox packaging" className="aspect-[4/3]" />
         </motion.figure>
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="order-1 space-y-3 lg:order-2">
-          {principles.map((item, index) => (
-            <motion.div variants={reveal} key={item} className="flex items-center justify-between border border-indikicks-black/10 bg-indikicks-cloud p-5 text-indikicks-black">
-              <span className="font-bold text-indikicks-black">{item}</span>
-              <span className="caption text-indikicks-concrete/60">0{index + 1}</span>
-            </motion.div>
-          ))}
-        </motion.div>
+        <div>
+          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.24 }} className="grid gap-4 sm:grid-cols-2">
+            <motion.figure variants={reveal} className="image-frame bg-indikicks-cloud p-2">
+              <SmartImage src={assets.card} alt="Indikicks Own Your Walk thank-you card" className="aspect-[4/3]" />
+            </motion.figure>
+            <motion.figure variants={reveal} className="image-frame bg-indikicks-cloud p-2">
+              <SmartImage src={assets.tissue} alt="Indikicks tonal logo-pattern tissue paper" className="aspect-[4/3]" />
+            </motion.figure>
+          </motion.div>
+          <motion.ul variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.26 }} className="mt-6 grid gap-3">
+            {bullets.map((item) => (
+              <motion.li variants={reveal} key={item} className="flex items-center gap-4 border border-indikicks-black/10 bg-indikicks-cloud px-5 py-4 text-sm font-semibold">
+                <span className="h-1.5 w-1.5 bg-indikicks-saffron" />
+                {item}
+              </motion.li>
+            ))}
+          </motion.ul>
+        </div>
       </div>
     </Section>
   )
 }
 
 function BrandVoiceSection() {
-  const principles = ['Speak in movement.', 'Keep lines short.', 'Confidence, not hype.', 'Indian without overexplaining India.']
-  const lines = ['Forward, From Here.', 'No Permission Needed.', 'Quiet Design. Loud Intent.', 'Built Here. Moving Everywhere.', 'For Streets That Do Not Stand Still.']
+  const lines = ['You were never meant to blend in.', 'Same streets. Different walk.', 'Move different. Stay yourself.', 'Culture starts with how you move.', 'Built for those who walk their own way.']
+  const principles = ['Speak in movement.', 'Keep lines short.', 'Confidence, not hype.', 'Indian without overexplaining India.', 'Emotional, not motivational.']
 
   return (
-    <Section id="voice" dark className="bg-indikicks-black text-indikicks-cloud" eyebrow="08 / Brand Voice" title="Short lines. Clear intent. No borrowed hype.">
-      <div className="grid gap-10 lg:grid-cols-[0.38fr_0.62fr]">
-        <div className="space-y-3">
-          {principles.map((principle) => <p key={principle} className="border-b border-indikicks-cloud/10 pb-4 text-indikicks-cloud/70">{principle}</p>)}
-        </div>
-        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mobile-snap-row lg:block lg:space-y-3 lg:overflow-visible">
-          {lines.map((line) => (
-            <motion.div variants={reveal} whileHover={{ y: -3 }} key={line} className="poster-line min-w-[82vw] snap-start border-indikicks-cloud/10 bg-indikicks-concrete text-indikicks-cloud lg:min-w-0">{line}</motion.div>
+    <Section id="voice" dark eyebrow="08 / Brand Voice" title="Own Your Walk.">
+      <div className="grid gap-10 lg:grid-cols-[0.36fr_0.64fr]">
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.24 }} className="space-y-3">
+          <motion.figure variants={reveal} className="image-frame border-indikicks-cloud/10 bg-indikicks-concrete p-2">
+            <SmartImage src={assets.card} alt="Indikicks campaign card with Own Your Walk message" className="aspect-[4/3]" />
+          </motion.figure>
+          {principles.map((principle) => <motion.p variants={reveal} key={principle} className="border-b border-indikicks-cloud/10 pb-4 text-sm leading-6 text-indikicks-cloud/70">{principle}</motion.p>)}
+        </motion.div>
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mobile-snap-row lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0">
+          {lines.map((line, index) => (
+            <motion.article variants={reveal} whileHover={{ y: -4, scale: 1.01 }} key={line} className="poster-card snap-card lg:min-w-0">
+              <span className="caption text-indikicks-saffron">0{index + 1}</span>
+              <p className="mt-12 font-display text-[26px] font-bold leading-tight tracking-normal sm:text-[34px]">{line}</p>
+            </motion.article>
           ))}
         </motion.div>
       </div>
@@ -409,48 +416,89 @@ function BrandVoiceSection() {
 }
 
 function CommunitySection() {
-  const ideas = ['Campus drops', 'City walks', 'Young creator collaborations', 'Street photography', 'Custom lacing', 'Design-led releases', 'Local music collaborations']
+  const cards = [
+    ['First Walk Club', 'Early customers from the first drop.'],
+    ['Campus Walks', 'College ambassador-led styling and movement moments.'],
+    ['City Routes', 'Photo walks through Indian streets, metro stations, campuses, and creative districts.'],
+    ['Walk Stories', 'Short reels asking real people: “What does owning your walk mean to you?”'],
+    ['Custom Lace Days', 'Offline customization pop-ups and community styling events.']
+  ]
 
   return (
-    <Section id="community" eyebrow="09 / Community & Culture" title="Culture grows through movement, not noise.">
-      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mobile-snap-row sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
-        {ideas.map((idea, index) => (
-          <motion.article variants={reveal} whileHover={{ y: -4 }} key={idea} className="quiet-card min-h-[190px] min-w-[80vw] snap-start sm:min-w-0">
-            <CircleDot className="h-4 w-4 text-indikicks-teal" />
-            <h3 className="mt-10 text-xl font-black tracking-tight">{idea}</h3>
-            <p className="mt-4 text-sm leading-6 text-indikicks-concrete/70">A local activation designed around real routes, creators, and product-first documentation.</p>
-            <span className="caption absolute bottom-5 right-5 text-indikicks-teal">0{index + 1}</span>
-          </motion.article>
-        ))}
-      </motion.div>
+    <Section id="community" eyebrow="09 / Community / Culture" title="From customers to culture." intro="The brand does not grow through hype alone. It grows through people who make the sneaker part of their own walk.">
+      <div className="grid gap-9 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
+        <motion.figure variants={imageReveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="image-frame min-h-[440px] bg-indikicks-white lg:min-h-[680px]">
+          <SmartImage src={assets.baggy} alt="Indikicks sneakers styled with baggy jeans in an editorial streetwear crop" />
+        </motion.figure>
+        <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} className="mobile-snap-row sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0">
+          {cards.map(([title, copy], index) => (
+            <motion.article variants={reveal} key={title} className="quiet-card snap-card sm:min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="caption text-indikicks-teal">0{index + 1}</span>
+                <MoveRight className="h-4 w-4 text-indikicks-saffron" />
+              </div>
+              <h3 className="mt-12 text-xl font-bold tracking-normal">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-indikicks-concrete/70">{copy}</p>
+            </motion.article>
+          ))}
+        </motion.div>
+      </div>
+    </Section>
+  )
+}
+
+function LaunchDropSection() {
+  const points = ['1 focused hero model', '4 color variants', 'First customer identity card', 'Launch sticker', 'QR campaign story', 'Early supporter access']
+
+  return (
+    <Section id="launch" dark eyebrow="10 / Launch Drop" title="The First Walk Drop" intro="The first 2,000 pairs are not just inventory. They are the beginning of the Indikicks community.">
+      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <motion.figure variants={imageReveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.24 }} className="image-frame border-indikicks-cloud/10 bg-indikicks-cloud p-4">
+          <SmartImage src={assets.top} alt="Top view of the first Indikicks sneaker drop pair" fit="object-contain" className="aspect-[4/3]" />
+        </motion.figure>
+        <div>
+          <motion.figure variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.24 }} className="mb-6 hidden border border-indikicks-cloud/10 bg-indikicks-concrete p-3 sm:block">
+            <SmartImage src={assets.opposite} alt="Opposite side view of Indikicks canvas sneaker" fit="object-contain" className="aspect-[16/10]" />
+          </motion.figure>
+          <motion.ul variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.24 }} className="grid gap-px overflow-hidden border border-indikicks-cloud/10 bg-indikicks-cloud/10">
+            {points.map((point, index) => (
+              <motion.li variants={reveal} key={point} className="flex min-h-16 items-center justify-between bg-indikicks-black px-5 text-sm font-semibold text-indikicks-cloud/75">
+                {point}
+                <span className="caption text-indikicks-saffron">0{index + 1}</span>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </div>
+      </div>
     </Section>
   )
 }
 
 function BrandBlueprintSection() {
   const tiles = [
-    ['Brand idea', 'Modern Indian Motion'],
-    ['Emotion', 'Self-possession'],
-    ['Positioning', 'Premium sneakers for India’s forward generation'],
-    ['Tagline', 'Forward, From Here.'],
-    ['Logo', 'Direction, movement, ambition'],
-    ['Product role', 'Everyday sneakers with cultural confidence']
+    ['Brand idea', 'Own Your Walk.'],
+    ['Category', 'Accessible street-premium sneakers.'],
+    ['Audience', 'Young expressive India.'],
+    ['Emotion', 'Self-expression with self-possession.'],
+    ['Visual world', 'Cinematic streetwear minimalism.'],
+    ['Signature asset', 'Stitched Forward Mark.'],
+    ['Community idea', 'First Walk Club.']
   ]
 
   return (
-    <Section id="blueprint" dark eyebrow="10 / Final Brand Blueprint" title="The system in one view.">
-      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="grid gap-px overflow-hidden border border-indikicks-cloud/10 bg-indikicks-concrete sm:grid-cols-2 lg:grid-cols-3">
+    <Section id="blueprint" dark eyebrow="11 / Final Brand Blueprint" title="The complete identity, reduced to what matters.">
+      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-px overflow-hidden border border-indikicks-cloud/10 bg-indikicks-cloud/10 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map(([label, value]) => (
-          <motion.div variants={reveal} key={label} className="min-h-[210px] bg-indikicks-concrete p-6">
+          <motion.article variants={reveal} key={label} className="min-h-[190px] bg-indikicks-concrete p-6">
             <p className="caption text-indikicks-cloud/50">{label}</p>
-            <p className="mt-12 max-w-sm text-2xl font-black tracking-tight text-indikicks-cloud">{value}</p>
-          </motion.div>
+            <p className="mt-11 max-w-sm text-xl font-bold leading-tight tracking-normal text-indikicks-cloud">{value}</p>
+          </motion.article>
         ))}
       </motion.div>
-      <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.9 }} className="mt-6 grid min-h-[520px] place-items-center border border-indikicks-cloud/10 bg-indikicks-concrete text-center">
+      <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.36 }} className="mt-6 grid min-h-[420px] place-items-center border border-indikicks-cloud/10 bg-indikicks-black text-center">
         <div>
-          <LogoMark className="mx-auto h-16 w-40" />
-          <p className="mx-auto mt-10 max-w-3xl text-[36px] font-black leading-tight tracking-tight sm:text-5xl">You don&apos;t have to look elsewhere to move forward.</p>
+          <motion.img variants={{ hidden: { opacity: 0, scale: 0.96 }, show: { opacity: 1, scale: 1, transition: { duration: 0.9, ease } } }} src={assets.logo} alt="Indikicks Forward Mark" className="mx-auto h-16 w-40 object-contain invert" />
+          <motion.p variants={reveal} className="mx-auto mt-10 max-w-3xl text-[32px] font-bold leading-tight tracking-normal text-indikicks-cloud sm:text-[48px]">You do not need to look elsewhere to move forward.</motion.p>
         </div>
       </motion.div>
     </Section>
@@ -460,19 +508,18 @@ function BrandBlueprintSection() {
 function Footer() {
   return (
     <footer className="bg-indikicks-black px-5 py-10 text-indikicks-cloud sm:px-8 lg:px-10">
-      <div className="mx-auto flex max-w-[1360px] flex-col gap-8 border-t border-indikicks-cloud/10 pt-8 md:flex-row md:items-center md:justify-between">
-        <a href="#hero" className="group flex items-center gap-4">
-          <LogoMark className="h-7 w-16 transition-transform duration-500 group-hover:translate-x-1" />
+      <div className="mx-auto flex max-w-[1320px] flex-col gap-8 border-t border-indikicks-cloud/10 pt-8 md:flex-row md:items-center md:justify-between">
+        <a href="#hero" className="group flex items-center gap-4 focus-link">
+          <img src={assets.logo} alt="" className="h-8 w-16 object-contain invert transition-transform duration-500 group-hover:translate-x-1" />
           <div>
-            <p className="font-black lowercase">indikicks</p>
-            <p className="text-sm text-indikicks-cloud/70">Built here. Moving everywhere.</p>
+            <p className="text-sm font-bold uppercase tracking-[0.2em]">Indikicks</p>
+            <p className="mt-1 text-sm text-indikicks-cloud/70">Built here. Moving everywhere.</p>
           </div>
         </a>
-        <nav className="flex flex-wrap gap-4 text-sm text-indikicks-cloud/70">
-          <a className="transition hover:text-indikicks-saffron" href="#logo">Identity</a>
-          <a className="transition hover:text-indikicks-saffron" href="#color">Colors</a>
-          <a className="transition hover:text-indikicks-saffron" href="#craft">Craft</a>
-          <a className="transition hover:text-indikicks-saffron" href="#packaging">Packaging</a>
+        <nav className="flex max-w-3xl flex-wrap gap-x-5 gap-y-3 text-sm text-indikicks-cloud/70" aria-label="Footer">
+          {navLinks.map(([label, href]) => (
+            <a key={href} className="transition duration-300 hover:text-indikicks-saffron focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indikicks-saffron" href={`#${href}`}>{label}</a>
+          ))}
         </nav>
       </div>
     </footer>
@@ -480,33 +527,25 @@ function Footer() {
 }
 
 function App() {
-  const sections = useMemo(
-    () => [
-      HeroSection,
-      BrandTensionSection,
-      BrandStorySection,
-      PositioningSection,
-      LogoSystemSection,
-      ColorSystemSection,
-      CraftsmanshipSection,
-      PackagingSection,
-      BrandVoiceSection,
-      CommunitySection,
-      BrandBlueprintSection,
-      Footer
-    ],
-    []
-  )
-
   return (
     <>
-      <IntroScreen />
       <ScrollProgress />
-      <CursorSpotlight />
       <Header />
       <main>
-        {sections.map((Component, index) => <Component key={index} />)}
+        <HeroSection />
+        <BrandTensionSection />
+        <BrandStorySection />
+        <PositioningSection />
+        <LogoSystemSection />
+        <ColorSystemSection />
+        <CraftsmanshipSection />
+        <PackagingSection />
+        <BrandVoiceSection />
+        <CommunitySection />
+        <LaunchDropSection />
+        <BrandBlueprintSection />
       </main>
+      <Footer />
     </>
   )
 }

@@ -14,16 +14,7 @@ export default {
           saffron: '#C56A2D',
           red: '#8E1F1F',
           ice: '#DCEBFF'
-        },
-        jet: '#000000',
-        cloud: '#F5F5F2',
-        concrete: '#2E2E2E',
-        stone: '#CFCAC2',
-        ash: '#A8A8A8',
-        ice: '#DCEBFF',
-        saffron: '#C56A2D',
-        energy: '#8E1F1F',
-        metro: '#285C4D'
+        }
       },
       fontFamily: {
         display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
