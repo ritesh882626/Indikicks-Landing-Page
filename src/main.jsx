@@ -13,7 +13,7 @@ import './styles.css'
 const A = '/assets/indikicks'
 
 const assets = {
-  logo: `${A}/logo/indikicks-symbol-transparent.png`,
+  logo: `${A}/logo/indikicks-mark-black.png`,
   side: `${A}/shoes/indikicks-side-view.png`,
   opposite: `${A}/shoes/indikicks-opposite-side-view.png`,
   top: `${A}/shoes/indikicks-top-view.png`,
@@ -497,7 +497,7 @@ function BrandBlueprintSection() {
       </motion.div>
       <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.36 }} className="mt-6 grid min-h-[420px] place-items-center border border-indikicks-cloud/10 bg-indikicks-black text-center">
         <div>
-          <motion.img variants={{ hidden: { opacity: 0, scale: 0.96 }, show: { opacity: 1, scale: 1, transition: { duration: 0.9, ease } } }} src={assets.logo} alt="Indikicks Forward Mark" className="mx-auto h-16 w-40 object-contain invert" />
+          <motion.img variants={{ hidden: { opacity: 0, scale: 0.96 }, show: { opacity: 1, scale: 1, transition: { duration: 0.9, ease } } }} src={assets.logo} alt="Indikicks Forward Mark" className="mx-auto h-16 w-40 object-contain" />
           <motion.p variants={reveal} className="mx-auto mt-10 max-w-3xl text-[32px] font-bold leading-tight tracking-normal text-indikicks-cloud sm:text-[48px]">You do not need to look elsewhere to move forward.</motion.p>
         </div>
       </motion.div>
@@ -510,7 +510,7 @@ function Footer() {
     <footer className="bg-indikicks-black px-5 py-10 text-indikicks-cloud sm:px-8 lg:px-10">
       <div className="mx-auto flex max-w-[1320px] flex-col gap-8 border-t border-indikicks-cloud/10 pt-8 md:flex-row md:items-center md:justify-between">
         <a href="#hero" className="group flex items-center gap-4 focus-link">
-          <img src={assets.logo} alt="" className="h-8 w-16 object-contain invert transition-transform duration-500 group-hover:translate-x-1" />
+          <img src={assets.logo} alt="" className="h-8 w-16 object-contain transition-transform duration-500 group-hover:translate-x-1" />
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.2em]">Indikicks</p>
             <p className="mt-1 text-sm text-indikicks-cloud/70">Built here. Moving everywhere.</p>
