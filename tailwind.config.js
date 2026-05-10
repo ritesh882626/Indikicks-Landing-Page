@@ -1,28 +1,26 @@
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx}'],
+  content: ['./app/**/*.{js,jsx,ts,tsx}', './components/**/*.{js,jsx,ts,tsx}', './lib/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
       colors: {
         indikicks: {
-          black: '#000000',
-          cloud: '#F5F5F2',
+          black: '#0A0A0A',
+          cloud: '#F5F5F5',
           white: '#FFFFFF',
-          concrete: '#2E2E2E',
-          stone: '#CFCAC2',
-          ash: '#A8A8A8',
-          teal: '#285C4D',
-          saffron: '#C56A2D',
-          red: '#8E1F1F',
-          ice: '#DCEBFF'
+          concrete: '#272727',
+          ash: '#8F8F8F',
+          ice: '#C7E6F6',
+          saffron: '#E5851F',
+          red: '#D7262E'
         }
       },
       fontFamily: {
-        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
-        condensed: ['Arial Narrow', 'Inter', 'system-ui', 'sans-serif']
+        display: ['var(--font-montserrat)', 'Montserrat', 'system-ui', 'sans-serif'],
+        body: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif']
       },
       boxShadow: {
-        editorial: '0 28px 90px rgba(0, 0, 0, 0.18)'
+        editorial: '0 28px 90px rgba(0, 0, 0, 0.18)',
+        dark: '0 34px 100px rgba(0, 0, 0, 0.42)'
       }
     }
   },
