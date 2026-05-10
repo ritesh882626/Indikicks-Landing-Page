@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  distDir: 'dist',
   turbopack: {
     root: process.cwd()
   },
