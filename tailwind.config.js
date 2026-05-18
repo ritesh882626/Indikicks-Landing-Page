@@ -4,14 +4,15 @@ export default {
     extend: {
       colors: {
         indikicks: {
-          black: '#0A0A0A',
-          cloud: '#F5F5F5',
+          black: '#000000',
+          cloud: '#F5F5F2',
           white: '#FFFFFF',
-          concrete: '#272727',
-          ash: '#8F8F8F',
-          ice: '#C7E6F6',
-          saffron: '#E5851F',
-          red: '#D7262E'
+          concrete: '#2E2E2E',
+          stone: '#CFCAC2',
+          ash: '#8A8A8A',
+          ice: '#DCEBFF',
+          saffron: '#C56A2D',
+          red: '#8E1F1F'
         }
       },
       fontFamily: {
